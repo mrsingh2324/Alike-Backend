@@ -3,7 +3,7 @@ import { MessageModel } from "../models/Message";
 import { ChatModel } from "../models/Chat";
 import { BlockedUserModel } from "../models/BlockedUser";
 import { ensureChatMembership, incrementUnreadForParticipants, resetUnreadCount } from "./chat.service";
-import { MessageStatus } from "@alike/shared";
+import { MessageStatus } from "../types/shared";
 
 export const getMessages = async (
   chatId: string,

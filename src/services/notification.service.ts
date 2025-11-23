@@ -2,7 +2,7 @@ import type { IMessage } from "../models/Message";
 import { DeviceTokenModel } from "../models/DeviceToken";
 import { getFirebaseApp } from "../config/firebase";
 import { logger } from "../config/logger";
-import { PlatformType } from "@alike/shared";
+import { PlatformType } from "../types/shared";
 
 export const registerDeviceToken = async (userId: string, token: string, platform: PlatformType) => {
   await DeviceTokenModel.updateOne(

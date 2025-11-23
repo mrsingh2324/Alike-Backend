@@ -5,7 +5,7 @@ import { ChatParticipantModel } from "../models/ChatParticipant";
 import { UserModel } from "../models/User";
 import { BlockedUserModel } from "../models/BlockedUser";
 import { MessageModel } from "../models/Message";
-import { ChatType } from "@alike/shared";
+import { ChatType } from "../types/shared";
 
 const ensureNotBlocked = async (userId: string, otherUserId: string) => {
   const [blockedByOther, blockedByUser] = await Promise.all([
@@ -112,7 +112,7 @@ export const listChats = async (userId: string) => {
       createdBy: chat.createdBy,
       groupName: chat.groupName,
       groupAvatarUrl: chat.groupAvatarUrl,
-  members: (chat.members as any[]).map((member: any) => ({
+      members: (chat.members as any[]).map((member: any) => ({
         id: member.id,
         name: member.name,
         profilePicUrl: member.profilePicUrl,
@@ -121,16 +121,16 @@ export const listChats = async (userId: string) => {
         lastSeen: member.lastSeen
       })),
       unreadCount: participant.unreadCount,
-  lastMessage: lastMessage
+      lastMessage: lastMessage
         ? {
-    id: lastMessage.id || lastMessage._id,
-    chatId: chat.id,
-    senderId: lastMessage.senderId,
-    text: lastMessage.text,
-    status: lastMessage.status,
-    createdAt: lastMessage.createdAt,
-    updatedAt: lastMessage.updatedAt
-          }
+          id: lastMessage.id || lastMessage._id,
+          chatId: chat.id,
+          senderId: lastMessage.senderId,
+          text: lastMessage.text,
+          status: lastMessage.status,
+          createdAt: lastMessage.createdAt,
+          updatedAt: lastMessage.updatedAt
+        }
         : null,
       createdAt: chat.createdAt,
       updatedAt: chat.updatedAt

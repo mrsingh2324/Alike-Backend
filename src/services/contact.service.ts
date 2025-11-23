@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import type { ContactInput } from "@alike/shared";
+import type { ContactInput } from "../types/shared";
 import { ContactModel } from "../models/Contact";
 import { UserModel, type IUserDocument } from "../models/User";
 import { BlockedUserModel } from "../models/BlockedUser";

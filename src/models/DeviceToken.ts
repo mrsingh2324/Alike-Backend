@@ -1,5 +1,5 @@
 import { Schema, model, type Model, type Types } from "mongoose";
-import { PlatformType } from "@alike/shared";
+import { PlatformType } from "../types/shared";
 
 export interface IDeviceToken {
   userId: Types.ObjectId;
