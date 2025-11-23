@@ -17,3 +17,4 @@ export const getFirebaseApp = () => {
     }
     return admin.app();
 };
+//# sourceMappingURL=firebase.js.map

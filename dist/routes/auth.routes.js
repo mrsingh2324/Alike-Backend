@@ -34,3 +34,4 @@ router.post("/verify-otp-phone", validateRequest(z.object({
 })), verifyPhoneOtpHandler);
 router.get("/me", authMiddleware, getCurrentUserHandler);
 export default router;
+//# sourceMappingURL=auth.routes.js.map

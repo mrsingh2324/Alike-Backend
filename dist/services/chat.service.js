@@ -4,7 +4,7 @@ import { ChatModel } from "../models/Chat";
 import { ChatParticipantModel } from "../models/ChatParticipant";
 import { UserModel } from "../models/User";
 import { BlockedUserModel } from "../models/BlockedUser";
-import { ChatType } from "../packages/shared/src";
+import { ChatType } from "../types/shared";
 const ensureNotBlocked = async (userId, otherUserId) => {
     const [blockedByOther, blockedByUser] = await Promise.all([
         BlockedUserModel.findOne({ userId: otherUserId, blockedUserId: userId }),
@@ -79,8 +79,9 @@ export const listChats = async (userId) => {
         ]
     });
     return participants.map((participant) => {
+        // populate may yield mixed types; treat as any for safety in mapping
         const chat = participant.chatId;
-        const lastMessage = chat.lastMessage;
+        const lastMessage = chat?.lastMessage ?? null;
         return {
             id: chat.id,
             type: chat.type,
@@ -98,7 +99,7 @@ export const listChats = async (userId) => {
             unreadCount: participant.unreadCount,
             lastMessage: lastMessage
                 ? {
-                    id: lastMessage.id,
+                    id: lastMessage.id || lastMessage._id,
                     chatId: chat.id,
                     senderId: lastMessage.senderId,
                     text: lastMessage.text,
@@ -145,7 +146,7 @@ export const removeMembers = async (chatId, adminId, memberIds) => {
     if (adminParticipant.role !== "admin") {
         throw createHttpError(403, "Only admins can remove members");
     }
-    await ChatParticipantModel.deleteMany({ chatId, userId: { $in: memberIds }, userId: { $ne: adminId } });
+    await ChatParticipantModel.deleteMany({ chatId, userId: { $in: memberIds, $ne: adminId } });
     await ChatModel.findByIdAndUpdate(chatId, {
         $pull: { members: { $in: memberIds.map((id) => new Types.ObjectId(id)) } }
     });
@@ -178,3 +179,4 @@ export const incrementUnreadForParticipants = async (chatId, senderId) => {
 export const resetUnreadCount = async (chatId, userId) => {
     await ChatParticipantModel.updateOne({ chatId, userId }, { unreadCount: 0, lastReadAt: new Date() });
 };
+//# sourceMappingURL=chat.service.js.map

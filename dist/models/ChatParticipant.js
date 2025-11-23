@@ -9,3 +9,4 @@ const ChatParticipantSchema = new Schema({
 }, { timestamps: true });
 ChatParticipantSchema.index({ chatId: 1, userId: 1 }, { unique: true });
 export const ChatParticipantModel = model("ChatParticipant", ChatParticipantSchema);
+//# sourceMappingURL=ChatParticipant.js.map

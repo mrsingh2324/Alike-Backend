@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import dayjs from "dayjs";
 // import { send } from "@emailjs/nodejs";
-// import { OTPChannel } from "../packages/shared/src";
+// import { OTPChannel } from "@alike/shared";
 import { UserModel } from "../models/User";
 import { OtpCodeModel } from "../models/OtpCode";
 import { env } from "../config/env";
@@ -157,3 +157,4 @@ export const getAuthenticatedUser = async (userId) => {
     }
     return user;
 };
+//# sourceMappingURL=auth.service.js.map

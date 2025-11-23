@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-// import { ChatType } from "../packages/shared/src";
+// import { ChatType } from "@alike/shared";
 // Local ChatType definition
 const ChatType = {
     SINGLE: 'single',
@@ -15,3 +15,4 @@ const ChatSchema = new Schema({
     lastMessage: { type: Schema.Types.ObjectId, ref: "Message" }
 }, { timestamps: true });
 export const ChatModel = model("Chat", ChatSchema);
+//# sourceMappingURL=Chat.js.map

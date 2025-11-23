@@ -44,3 +44,4 @@ export const updateGroupHandler = asyncHandler(async (req, res) => {
     });
     res.json({ success: true });
 });
+//# sourceMappingURL=chat.controller.js.map

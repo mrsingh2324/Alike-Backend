@@ -33,3 +33,4 @@ router.get("/:userId", authMiddleware, validateRequest(z.object({
     })
 })), getUserByIdHandler);
 export default router;
+//# sourceMappingURL=user.routes.js.map

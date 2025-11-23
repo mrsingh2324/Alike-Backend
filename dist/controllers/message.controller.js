@@ -23,3 +23,4 @@ export const markReadHandler = asyncHandler(async (req, res) => {
     await markMessagesRead(chatId, req.userId);
     res.json({ success: true });
 });
+//# sourceMappingURL=message.controller.js.map

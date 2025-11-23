@@ -3,7 +3,7 @@ import { MessageModel } from "../models/Message";
 import { ChatModel } from "../models/Chat";
 import { BlockedUserModel } from "../models/BlockedUser";
 import { ensureChatMembership, incrementUnreadForParticipants, resetUnreadCount } from "./chat.service";
-import { MessageStatus } from "../packages/shared/src";
+import { MessageStatus } from "../types/shared";
 export const getMessages = async (chatId, userId, options) => {
     await ensureChatMembership(chatId, userId);
     const limit = Math.min(options.limit ?? 30, 100);
@@ -57,3 +57,4 @@ export const markMessagesRead = async (chatId, userId) => {
     await MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: { $ne: MessageStatus.READ } }, { status: MessageStatus.READ });
     await resetUnreadCount(chatId, userId);
 };
+//# sourceMappingURL=message.service.js.map

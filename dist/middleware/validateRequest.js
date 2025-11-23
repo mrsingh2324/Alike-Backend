@@ -10,3 +10,4 @@ export const validateRequest = (schema) => {
         return next();
     };
 };
+//# sourceMappingURL=validateRequest.js.map

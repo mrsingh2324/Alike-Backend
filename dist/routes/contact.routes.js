@@ -28,3 +28,4 @@ router.post("/unblock", authMiddleware, validateRequest(z.object({
 })), unblockUserHandler);
 router.get("/blocked", authMiddleware, getBlockedUsersHandler);
 export default router;
+//# sourceMappingURL=contact.routes.js.map

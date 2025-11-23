@@ -16,3 +16,4 @@ router.post("/unregister-token", authMiddleware, validateRequest(z.object({
     })
 })), unregisterTokenHandler);
 export default router;
+//# sourceMappingURL=notification.routes.js.map

@@ -17,3 +17,4 @@ export const getPresenceAudience = async (userId) => {
     }).select("userId");
     return Array.from(new Set(peers.map((peer) => peer.userId.toString())));
 };
+//# sourceMappingURL=presence.service.js.map

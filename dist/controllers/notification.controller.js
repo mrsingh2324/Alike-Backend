@@ -10,3 +10,4 @@ export const unregisterTokenHandler = asyncHandler(async (req, res) => {
     await unregisterDeviceToken(token);
     res.json({ success: true });
 });
+//# sourceMappingURL=notification.controller.js.map

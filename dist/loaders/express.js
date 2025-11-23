@@ -33,3 +33,4 @@ export const createExpressApp = () => {
     app.use(errorHandler);
     return app;
 };
+//# sourceMappingURL=express.js.map

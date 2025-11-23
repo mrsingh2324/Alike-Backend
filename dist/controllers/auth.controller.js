@@ -1,4 +1,4 @@
-// import { OTPChannel } from "../packages/shared/src";
+// import { OTPChannel } from "@alike/shared";
 import { asyncHandler } from "../utils/asyncHandler";
 import { requestEmailOtp, requestPhoneOtp, verifyOtp, getAuthenticatedUser } from "../services/auth.service";
 // Local OTPChannel definition
@@ -52,3 +52,4 @@ export const getCurrentUserHandler = asyncHandler(async (req, res) => {
     const user = await getAuthenticatedUser(req.userId);
     res.json({ success: true, data: user });
 });
+//# sourceMappingURL=auth.controller.js.map

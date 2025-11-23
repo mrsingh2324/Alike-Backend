@@ -3,3 +3,4 @@ export const asyncHandler = (handler) => {
         Promise.resolve(handler(req, res, next)).catch(next);
     };
 };
+//# sourceMappingURL=asyncHandler.js.map

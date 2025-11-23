@@ -33,3 +33,4 @@ const envSchema = z.object({
 });
 export const env = envSchema.parse(process.env);
 export const isProduction = env.NODE_ENV === "production";
+//# sourceMappingURL=env.js.map

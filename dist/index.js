@@ -23,3 +23,4 @@ process.on("uncaughtException", (error) => {
     logger.error({ error }, "Uncaught Exception");
     process.exit(1);
 });
+//# sourceMappingURL=index.js.map

@@ -20,3 +20,4 @@ export const getBlockedUsersHandler = asyncHandler(async (req, res) => {
     const blocked = await getBlockedUsers(req.userId);
     res.json({ success: true, data: blocked });
 });
+//# sourceMappingURL=contact.controller.js.map

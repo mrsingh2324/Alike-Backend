@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-// import { OTPChannel } from "../packages/shared/src";
+// import { OTPChannel } from "@alike/shared";
 // Local OTPChannel definition
 const OTPChannel = {
     PHONE: 'phone',
@@ -14,3 +14,4 @@ const OtpCodeSchema = new Schema({
 }, { timestamps: true });
 OtpCodeSchema.index({ channel: 1, target: 1 }, { unique: true });
 export const OtpCodeModel = model("OtpCode", OtpCodeSchema);
+//# sourceMappingURL=OtpCode.js.map

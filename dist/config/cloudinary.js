@@ -6,3 +6,4 @@ cloudinary.config({
     api_secret: env.CLOUDINARY_API_SECRET
 });
 export { cloudinary };
+//# sourceMappingURL=cloudinary.js.map

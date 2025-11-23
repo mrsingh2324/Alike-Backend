@@ -10,3 +10,4 @@ export const signAccessToken = (userId) => {
 export const verifyAccessToken = (token) => {
     return jwt.verify(token, env.JWT_SECRET);
 };
+//# sourceMappingURL=jwt.js.map

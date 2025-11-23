@@ -24,7 +24,7 @@ export const sendMessageNotification = async (recipientIds, message, senderName)
         },
         data: {
             chatId: message.chatId.toString(),
-            messageId: message._id.toString()
+            messageId: (message._id || message.id).toString()
         }
     };
     const chunks = Array.from({ length: Math.ceil(tokens.length / 500) }, (_v, i) => tokens.slice(i * 500, i * 500 + 500));
@@ -32,3 +32,4 @@ export const sendMessageNotification = async (recipientIds, message, senderName)
         .sendMulticast({ ...payload, tokens: chunk.map((c) => c.token) })
         .catch((error) => logger.error({ error }, "FCM send failed"))));
 };
+//# sourceMappingURL=notification.service.js.map

@@ -48,3 +48,4 @@ router.post("/:chatId/update", authMiddleware, validateRequest(z.object({
     })
 })), updateGroupHandler);
 export default router;
+//# sourceMappingURL=chat.routes.js.map

@@ -29,3 +29,4 @@ export const searchUserByPhoneHandler = asyncHandler(async (req, res) => {
     }
     res.json({ success: true, data: user });
 });
+//# sourceMappingURL=user.controller.js.map

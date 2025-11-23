@@ -22,3 +22,4 @@ router.post("/read", authMiddleware, validateRequest(z.object({
     params: z.object({ chatId: z.string().min(1) })
 })), markReadHandler);
 export default router;
+//# sourceMappingURL=message.routes.js.map

@@ -5,3 +5,4 @@ const ContactSchema = new Schema({
 }, { timestamps: true });
 ContactSchema.index({ ownerUserId: 1, contactUserId: 1 }, { unique: true });
 export const ContactModel = model("Contact", ContactSchema);
+//# sourceMappingURL=Contact.js.map

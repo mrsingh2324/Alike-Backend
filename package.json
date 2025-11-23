@@ -4,7 +4,6 @@
   "private": true,
   "description": "Express + Socket.io backend for chat app",
   "main": "dist/index.js",
-  "type": "module",
   "scripts": {
     "nodemon": "nodemon src/index.ts",
     "dev": "tsx watch src/index.ts",

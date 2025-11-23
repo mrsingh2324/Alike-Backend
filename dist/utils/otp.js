@@ -11,3 +11,4 @@ export const hashOtp = async (otp) => {
 export const verifyOtpHash = (otp, hash) => {
     return bcrypt.compare(otp, hash);
 };
+//# sourceMappingURL=otp.js.map

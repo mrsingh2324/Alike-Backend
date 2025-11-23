@@ -24,3 +24,4 @@ export const authMiddleware = async (req, _res, next) => {
         return next(createHttpError(401, error.message));
     }
 };
+//# sourceMappingURL=authMiddleware.js.map

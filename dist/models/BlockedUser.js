@@ -5,3 +5,4 @@ const BlockedUserSchema = new Schema({
 }, { timestamps: { createdAt: true, updatedAt: false } });
 BlockedUserSchema.index({ userId: 1, blockedUserId: 1 }, { unique: true });
 export const BlockedUserModel = model("BlockedUser", BlockedUserSchema);
+//# sourceMappingURL=BlockedUser.js.map

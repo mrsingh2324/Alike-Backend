@@ -10,3 +10,4 @@ const UserSchema = new Schema({
     lastSeen: { type: Date, default: null }
 }, { timestamps: true });
 export const UserModel = model("User", UserSchema);
+//# sourceMappingURL=User.js.map

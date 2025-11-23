@@ -36,3 +36,4 @@ process.on("SIGTERM", async () => {
     await cleanup();
     process.exit(0);
 });
+//# sourceMappingURL=database.js.map

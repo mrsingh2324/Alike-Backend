@@ -12,3 +12,4 @@ export const logger = pino({
             }
         }
 });
+//# sourceMappingURL=logger.js.map
