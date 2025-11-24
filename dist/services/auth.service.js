@@ -1,32 +1,38 @@
-import createHttpError from "http-errors";
-import dayjs from "dayjs";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getAuthenticatedUser = exports.verifyOtp = exports.requestPhoneOtp = exports.requestEmailOtp = void 0;
+const http_errors_1 = __importDefault(require("http-errors"));
+const dayjs_1 = __importDefault(require("dayjs"));
 // import { send } from "@emailjs/nodejs";
 // import { OTPChannel } from "@alike/shared";
-import { UserModel } from "../models/User";
-import { OtpCodeModel } from "../models/OtpCode";
-import { env } from "../config/env";
-import { getTwilioClient } from "../config/twilio";
-import { hashOtp, generateNumericOtp, verifyOtpHash } from "../utils/otp";
-import { signAccessToken } from "../utils/jwt";
-import { createOrUpdateUser, generateUniqueId } from "./user.service";
-import { sendOtpEmail } from "./emailService";
-import { logger } from "../config/logger";
+const User_1 = require("../models/User");
+const OtpCode_1 = require("../models/OtpCode");
+const env_1 = require("../config/env");
+const twilio_1 = require("../config/twilio");
+const otp_1 = require("../utils/otp");
+const jwt_1 = require("../utils/jwt");
+const user_service_1 = require("./user.service");
+const emailService_1 = require("./emailService");
+const logger_1 = require("../config/logger");
 const OTPChannel = {
     PHONE: "phone",
     EMAIL: "email"
 };
 const OTP_LENGTH = 6;
 const upsertOtp = async (channel, target, code) => {
-    const codeHash = await hashOtp(code);
-    const expiresAt = dayjs().add(env.OTP_EXPIRY_MINUTES, "minute").toDate();
-    if (env.NODE_ENV !== "production") {
-        logger.info({ channel, target, code, expiresAt }, "OTP generated (development mode)");
+    const codeHash = await (0, otp_1.hashOtp)(code);
+    const expiresAt = (0, dayjs_1.default)().add(env_1.env.OTP_EXPIRY_MINUTES, "minute").toDate();
+    if (env_1.env.NODE_ENV !== "production") {
+        logger_1.logger.info({ channel, target, code, expiresAt }, "OTP generated (development mode)");
     }
-    await OtpCodeModel.findOneAndUpdate({ channel, target }, { codeHash, expiresAt, attempts: 0 }, { upsert: true, new: true });
+    await OtpCode_1.OtpCodeModel.findOneAndUpdate({ channel, target }, { codeHash, expiresAt, attempts: 0 }, { upsert: true, new: true });
     return expiresAt;
 };
 const sendEmailOtp = async (email, code) => {
-    await sendOtpEmail(email, code);
+    await (0, emailService_1.sendOtpEmail)(email, code);
     /*
     if (!env.EMAILJS_SERVICE_ID || !env.EMAILJS_TEMPLATE_ID || !env.EMAILJS_PUBLIC_KEY || !env.EMAILJS_PRIVATE_KEY) {
       const message = "EmailJS credentials missing; cannot send OTP email";
@@ -69,34 +75,36 @@ const sendEmailOtp = async (email, code) => {
     */
 };
 const sendPhoneOtp = async (phone, code) => {
-    const client = getTwilioClient();
-    if (!client || !env.TWILIO_PHONE_NUMBER) {
-        logger.warn("Twilio credentials missing; skipping SMS OTP send");
+    const client = (0, twilio_1.getTwilioClient)();
+    if (!client || !env_1.env.TWILIO_PHONE_NUMBER) {
+        logger_1.logger.warn("Twilio credentials missing; skipping SMS OTP send");
         return;
     }
     await client.messages.create({
         body: `Your Alike verification code is ${code}`,
-        from: env.TWILIO_PHONE_NUMBER,
+        from: env_1.env.TWILIO_PHONE_NUMBER,
         to: phone
     });
 };
-export const requestEmailOtp = async (email) => {
-    const otp = generateNumericOtp(OTP_LENGTH);
+const requestEmailOtp = async (email) => {
+    const otp = (0, otp_1.generateNumericOtp)(OTP_LENGTH);
     const expiresAt = await upsertOtp(OTPChannel.EMAIL, email.toLowerCase(), otp);
     await sendEmailOtp(email, otp);
     return { expiresAt };
 };
-export const requestPhoneOtp = async (phone) => {
-    const otp = generateNumericOtp(OTP_LENGTH);
+exports.requestEmailOtp = requestEmailOtp;
+const requestPhoneOtp = async (phone) => {
+    const otp = (0, otp_1.generateNumericOtp)(OTP_LENGTH);
     const expiresAt = await upsertOtp(OTPChannel.PHONE, phone, otp);
     await sendPhoneOtp(phone, otp);
     return { expiresAt };
 };
+exports.requestPhoneOtp = requestPhoneOtp;
 const getOrCreateUser = async ({ email, phone, name, profilePicUrl }) => {
     if (!name) {
-        throw createHttpError(400, "Name is required for first-time signup");
+        throw (0, http_errors_1.default)(400, "Name is required for first-time signup");
     }
-    const user = await createOrUpdateUser({
+    const user = await (0, user_service_1.createOrUpdateUser)({
         email: email?.toLowerCase(),
         phone,
         name,
@@ -106,44 +114,45 @@ const getOrCreateUser = async ({ email, phone, name, profilePicUrl }) => {
     return user;
 };
 const consumeOtp = async ({ channel, target, otp }) => {
-    const record = await OtpCodeModel.findOne({ channel, target });
+    const record = await OtpCode_1.OtpCodeModel.findOne({ channel, target });
     if (!record) {
-        throw createHttpError(400, "OTP not found. Request a new code.");
+        throw (0, http_errors_1.default)(400, "OTP not found. Request a new code.");
     }
-    if (dayjs(record.expiresAt).isBefore(dayjs())) {
+    if ((0, dayjs_1.default)(record.expiresAt).isBefore((0, dayjs_1.default)())) {
         await record.deleteOne();
-        throw createHttpError(400, "OTP has expired. Request a new code.");
+        throw (0, http_errors_1.default)(400, "OTP has expired. Request a new code.");
     }
-    const isValid = await verifyOtpHash(otp, record.codeHash);
+    const isValid = await (0, otp_1.verifyOtpHash)(otp, record.codeHash);
     if (!isValid) {
         record.attempts += 1;
         await record.save();
-        throw createHttpError(400, "Incorrect OTP");
+        throw (0, http_errors_1.default)(400, "Incorrect OTP");
     }
     await record.deleteOne();
 };
-export const verifyOtp = async (params) => {
+const verifyOtp = async (params) => {
     const { channel, target, otp, name, email, phone, profilePicUrl } = params;
     await consumeOtp({ channel, target, otp });
     const user = await getOrCreateUser({ email, phone, name, profilePicUrl });
-    const accessToken = signAccessToken(user.id);
+    const accessToken = (0, jwt_1.signAccessToken)(user.id);
     return {
         accessToken,
         user
     };
 };
-export const getAuthenticatedUser = async (userId) => {
-    const user = await UserModel.findById(userId);
+exports.verifyOtp = verifyOtp;
+const getAuthenticatedUser = async (userId) => {
+    const user = await User_1.UserModel.findById(userId);
     if (!user) {
-        throw createHttpError(404, "User not found");
+        throw (0, http_errors_1.default)(404, "User not found");
     }
     if (!user.uniqueId) {
         let uniqueId;
         let attempts = 0;
         const maxAttempts = 10;
         do {
-            uniqueId = generateUniqueId();
-            const existingUser = await UserModel.findOne({ uniqueId });
+            uniqueId = (0, user_service_1.generateUniqueId)();
+            const existingUser = await User_1.UserModel.findOne({ uniqueId });
             if (!existingUser) {
                 user.uniqueId = uniqueId;
                 await user.save();
@@ -152,9 +161,10 @@ export const getAuthenticatedUser = async (userId) => {
             attempts++;
         } while (attempts < maxAttempts);
         if (attempts >= maxAttempts) {
-            throw createHttpError(500, "Failed to generate unique ID");
+            throw (0, http_errors_1.default)(500, "Failed to generate unique ID");
         }
     }
     return user;
 };
+exports.getAuthenticatedUser = getAuthenticatedUser;
 //# sourceMappingURL=auth.service.js.map

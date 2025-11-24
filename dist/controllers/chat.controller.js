@@ -1,44 +1,47 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { createOrGetSingleChat, createGroupChat, listChats, getChatDetails, addMembers, removeMembers, makeAdmin, updateGroupDetails } from "../services/chat.service";
-export const createSingleChatHandler = asyncHandler(async (req, res) => {
-    const chat = await createOrGetSingleChat(req.userId, req.body.targetUserId);
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateGroupHandler = exports.makeAdminHandler = exports.removeMembersHandler = exports.addMembersHandler = exports.getChatHandler = exports.listChatsHandler = exports.createGroupChatHandler = exports.createSingleChatHandler = void 0;
+const asyncHandler_1 = require("../utils/asyncHandler");
+const chat_service_1 = require("../services/chat.service");
+exports.createSingleChatHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+    const chat = await (0, chat_service_1.createOrGetSingleChat)(req.userId, req.body.targetUserId);
     res.json({ success: true, data: chat });
 });
-export const createGroupChatHandler = asyncHandler(async (req, res) => {
-    const chat = await createGroupChat(req.userId, {
+exports.createGroupChatHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+    const chat = await (0, chat_service_1.createGroupChat)(req.userId, {
         name: req.body.name,
         memberIds: req.body.memberIds ?? [],
         avatarUrl: req.body.avatarUrl
     });
     res.json({ success: true, data: chat });
 });
-export const listChatsHandler = asyncHandler(async (req, res) => {
-    const chats = await listChats(req.userId);
+exports.listChatsHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+    const chats = await (0, chat_service_1.listChats)(req.userId);
     res.json({ success: true, data: chats });
 });
-export const getChatHandler = asyncHandler(async (req, res) => {
+exports.getChatHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    const chat = await getChatDetails(chatId, req.userId);
+    const chat = await (0, chat_service_1.getChatDetails)(chatId, req.userId);
     res.json({ success: true, data: chat });
 });
-export const addMembersHandler = asyncHandler(async (req, res) => {
+exports.addMembersHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    await addMembers(chatId, req.userId, req.body.memberIds ?? []);
+    await (0, chat_service_1.addMembers)(chatId, req.userId, req.body.memberIds ?? []);
     res.json({ success: true });
 });
-export const removeMembersHandler = asyncHandler(async (req, res) => {
+exports.removeMembersHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    await removeMembers(chatId, req.userId, req.body.memberIds ?? []);
+    await (0, chat_service_1.removeMembers)(chatId, req.userId, req.body.memberIds ?? []);
     res.json({ success: true });
 });
-export const makeAdminHandler = asyncHandler(async (req, res) => {
+exports.makeAdminHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    await makeAdmin(chatId, req.userId, req.body.memberId);
+    await (0, chat_service_1.makeAdmin)(chatId, req.userId, req.body.memberId);
     res.json({ success: true });
 });
-export const updateGroupHandler = asyncHandler(async (req, res) => {
+exports.updateGroupHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    await updateGroupDetails(chatId, req.userId, {
+    await (0, chat_service_1.updateGroupDetails)(chatId, req.userId, {
         name: req.body.name,
         avatarUrl: req.body.avatarUrl
     });

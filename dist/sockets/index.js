@@ -1,14 +1,20 @@
-import { Server } from "socket.io";
-import createHttpError from "http-errors";
-import { verifyAccessToken } from "../utils/jwt";
-import { env } from "../config/env";
-import { logger } from "../config/logger";
-import { ensureChatMembership } from "../services/chat.service";
-import { sendMessage, markMessagesDelivered, markMessagesRead } from "../services/message.service";
-import { setUserOnline, setUserOffline, getPresenceAudience } from "../services/presence.service";
-import { sendMessageNotification } from "../services/notification.service";
-import { ChatModel } from "../models/Chat";
-import { UserModel } from "../models/User";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.initSocketServer = void 0;
+const socket_io_1 = require("socket.io");
+const http_errors_1 = __importDefault(require("http-errors"));
+const jwt_1 = require("../utils/jwt");
+const env_1 = require("../config/env");
+const logger_1 = require("../config/logger");
+const chat_service_1 = require("../services/chat.service");
+const message_service_1 = require("../services/message.service");
+const presence_service_1 = require("../services/presence.service");
+const notification_service_1 = require("../services/notification.service");
+const Chat_1 = require("../models/Chat");
+const User_1 = require("../models/User");
 const userSockets = new Map();
 const activeChatMap = new Map();
 const addSocket = (userId, socketId) => {
@@ -26,7 +32,7 @@ const removeSocket = (userId, socketId) => {
     }
 };
 const broadcastPresence = async (io, userId, isOnline) => {
-    const audience = await getPresenceAudience(userId);
+    const audience = await (0, presence_service_1.getPresenceAudience)(userId);
     if (!audience.length)
         return;
     const payload = { userId, isOnline, lastSeen: new Date().toISOString() };
@@ -34,10 +40,10 @@ const broadcastPresence = async (io, userId, isOnline) => {
         io.to(`user:${targetId}`).emit("user-presence", payload);
     });
 };
-export const initSocketServer = (server) => {
-    const io = new Server(server, {
+const initSocketServer = (server) => {
+    const io = new socket_io_1.Server(server, {
         cors: {
-            origin: env.ALLOWED_ORIGINS?.split(",").filter(Boolean) || true,
+            origin: env_1.env.ALLOWED_ORIGINS?.split(",").filter(Boolean) || true,
             credentials: true
         }
     });
@@ -47,15 +53,15 @@ export const initSocketServer = (server) => {
             : undefined;
         const token = socket.handshake.auth?.token ?? tokenHeader;
         if (!token) {
-            return next(createHttpError(401, "Authentication token missing"));
+            return next((0, http_errors_1.default)(401, "Authentication token missing"));
         }
         try {
-            const payload = verifyAccessToken(token);
+            const payload = (0, jwt_1.verifyAccessToken)(token);
             socket.data.userId = payload.sub;
             next();
         }
         catch (error) {
-            next(createHttpError(401, error.message));
+            next((0, http_errors_1.default)(401, error.message));
         }
     });
     io.on("connection", async (socket) => {
@@ -66,17 +72,17 @@ export const initSocketServer = (server) => {
         }
         addSocket(userId, socket.id);
         socket.join(`user:${userId}`);
-        await setUserOnline(userId);
+        await (0, presence_service_1.setUserOnline)(userId);
         await broadcastPresence(io, userId, true);
         socket.on("join-chat", async ({ chatId }) => {
             try {
-                await ensureChatMembership(chatId, userId);
+                await (0, chat_service_1.ensureChatMembership)(chatId, userId);
                 socket.join(`chat:${chatId}`);
                 activeChatMap.set(userId, chatId);
-                await markMessagesDelivered(chatId, userId);
+                await (0, message_service_1.markMessagesDelivered)(chatId, userId);
             }
             catch (error) {
-                logger.error({ error }, "join-chat failed");
+                logger_1.logger.error({ error }, "join-chat failed");
             }
         });
         socket.on("leave-chat", ({ chatId }) => {
@@ -87,53 +93,54 @@ export const initSocketServer = (server) => {
         });
         socket.on("send-message", async (payload, callback) => {
             try {
-                const message = await sendMessage(payload.chatId, userId, payload.text);
+                const message = await (0, message_service_1.sendMessage)(payload.chatId, userId, payload.text);
                 const populatedMessage = await message.populate("senderId", "name profilePicUrl");
                 io.to(`chat:${payload.chatId}`).emit("new-message", populatedMessage);
-                const chat = await ChatModel.findById(payload.chatId).lean();
+                const chat = await Chat_1.ChatModel.findById(payload.chatId).lean();
                 if (chat) {
                     const recipientIds = chat.members
                         .map((member) => member.toString())
                         .filter((member) => member !== userId && activeChatMap.get(member) !== payload.chatId);
                     if (recipientIds.length) {
-                        const sender = await UserModel.findById(userId).lean();
+                        const sender = await User_1.UserModel.findById(userId).lean();
                         if (sender) {
-                            await sendMessageNotification(recipientIds, message, chat.type === "group" ? chat.groupName ?? sender.name : sender.name);
+                            await (0, notification_service_1.sendMessageNotification)(recipientIds, message, chat.type === "group" ? chat.groupName ?? sender.name : sender.name);
                         }
                     }
                 }
                 callback?.({ success: true, data: populatedMessage });
             }
             catch (error) {
-                logger.error({ error }, "send-message failed");
+                logger_1.logger.error({ error }, "send-message failed");
                 callback?.({ success: false, error: error.message });
             }
         });
         socket.on("message-delivered", async ({ chatId }) => {
             try {
-                await markMessagesDelivered(chatId, userId);
+                await (0, message_service_1.markMessagesDelivered)(chatId, userId);
             }
             catch (error) {
-                logger.error({ error }, "message-delivered handler failed");
+                logger_1.logger.error({ error }, "message-delivered handler failed");
             }
         });
         socket.on("message-read", async ({ chatId }) => {
             try {
-                await markMessagesRead(chatId, userId);
+                await (0, message_service_1.markMessagesRead)(chatId, userId);
             }
             catch (error) {
-                logger.error({ error }, "message-read handler failed");
+                logger_1.logger.error({ error }, "message-read handler failed");
             }
         });
         socket.on("disconnect", async () => {
             removeSocket(userId, socket.id);
             activeChatMap.delete(userId);
             if (!userSockets.has(userId)) {
-                await setUserOffline(userId);
+                await (0, presence_service_1.setUserOffline)(userId);
                 await broadcastPresence(io, userId, false);
             }
         });
     });
     return io;
 };
+exports.initSocketServer = initSocketServer;
 //# sourceMappingURL=index.js.map

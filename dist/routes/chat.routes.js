@@ -1,51 +1,53 @@
-import { Router } from "express";
-import { z } from "zod";
-import { authMiddleware } from "../middleware/authMiddleware";
-import { validateRequest } from "../middleware/validateRequest";
-import { createSingleChatHandler, createGroupChatHandler, listChatsHandler, getChatHandler, addMembersHandler, removeMembersHandler, makeAdminHandler, updateGroupHandler } from "../controllers/chat.controller";
-const router = Router();
-router.post("/single", authMiddleware, validateRequest(z.object({
-    body: z.object({
-        targetUserId: z.string().min(1)
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const zod_1 = require("zod");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const validateRequest_1 = require("../middleware/validateRequest");
+const chat_controller_1 = require("../controllers/chat.controller");
+const router = (0, express_1.Router)();
+router.post("/single", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    body: zod_1.z.object({
+        targetUserId: zod_1.z.string().min(1)
     })
-})), createSingleChatHandler);
-router.post("/group", authMiddleware, validateRequest(z.object({
-    body: z.object({
-        name: z.string().min(1),
-        memberIds: z.array(z.string()).default([]),
-        avatarUrl: z.string().url().optional()
+})), chat_controller_1.createSingleChatHandler);
+router.post("/group", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    body: zod_1.z.object({
+        name: zod_1.z.string().min(1),
+        memberIds: zod_1.z.array(zod_1.z.string()).default([]),
+        avatarUrl: zod_1.z.string().url().optional()
     })
-})), createGroupChatHandler);
-router.get("/", authMiddleware, listChatsHandler);
-router.get("/:chatId", authMiddleware, validateRequest(z.object({
-    params: z.object({
-        chatId: z.string().min(1)
+})), chat_controller_1.createGroupChatHandler);
+router.get("/", authMiddleware_1.authMiddleware, chat_controller_1.listChatsHandler);
+router.get("/:chatId", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    params: zod_1.z.object({
+        chatId: zod_1.z.string().min(1)
     })
-})), getChatHandler);
-router.post("/:chatId/members/add", authMiddleware, validateRequest(z.object({
-    params: z.object({ chatId: z.string().min(1) }),
-    body: z.object({
-        memberIds: z.array(z.string()).min(1)
+})), chat_controller_1.getChatHandler);
+router.post("/:chatId/members/add", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    params: zod_1.z.object({ chatId: zod_1.z.string().min(1) }),
+    body: zod_1.z.object({
+        memberIds: zod_1.z.array(zod_1.z.string()).min(1)
     })
-})), addMembersHandler);
-router.post("/:chatId/members/remove", authMiddleware, validateRequest(z.object({
-    params: z.object({ chatId: z.string().min(1) }),
-    body: z.object({
-        memberIds: z.array(z.string()).min(1)
+})), chat_controller_1.addMembersHandler);
+router.post("/:chatId/members/remove", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    params: zod_1.z.object({ chatId: zod_1.z.string().min(1) }),
+    body: zod_1.z.object({
+        memberIds: zod_1.z.array(zod_1.z.string()).min(1)
     })
-})), removeMembersHandler);
-router.post("/:chatId/members/make-admin", authMiddleware, validateRequest(z.object({
-    params: z.object({ chatId: z.string().min(1) }),
-    body: z.object({
-        memberId: z.string().min(1)
+})), chat_controller_1.removeMembersHandler);
+router.post("/:chatId/members/make-admin", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    params: zod_1.z.object({ chatId: zod_1.z.string().min(1) }),
+    body: zod_1.z.object({
+        memberId: zod_1.z.string().min(1)
     })
-})), makeAdminHandler);
-router.post("/:chatId/update", authMiddleware, validateRequest(z.object({
-    params: z.object({ chatId: z.string().min(1) }),
-    body: z.object({
-        name: z.string().optional(),
-        avatarUrl: z.string().url().optional()
+})), chat_controller_1.makeAdminHandler);
+router.post("/:chatId/update", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    params: zod_1.z.object({ chatId: zod_1.z.string().min(1) }),
+    body: zod_1.z.object({
+        name: zod_1.z.string().optional(),
+        avatarUrl: zod_1.z.string().url().optional()
     })
-})), updateGroupHandler);
-export default router;
+})), chat_controller_1.updateGroupHandler);
+exports.default = router;
 //# sourceMappingURL=chat.routes.js.map

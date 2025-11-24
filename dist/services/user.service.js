@@ -1,13 +1,20 @@
-import createHttpError from "http-errors";
-import { UserModel } from "../models/User";
-import crypto from 'crypto';
-export const generateUniqueId = () => {
-    // Generate a 8-character unique ID
-    return crypto.randomBytes(4).toString('hex').toUpperCase();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-export const createOrUpdateUser = async (userData) => {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.searchUserByPhone = exports.searchUserByUniqueId = exports.normalizePhoneNumber = exports.getPublicProfile = exports.updateProfile = exports.getProfile = exports.createOrUpdateUser = exports.generateUniqueId = void 0;
+const http_errors_1 = __importDefault(require("http-errors"));
+const User_1 = require("../models/User");
+const crypto_1 = __importDefault(require("crypto"));
+const generateUniqueId = () => {
+    // Generate a 8-character unique ID
+    return crypto_1.default.randomBytes(4).toString('hex').toUpperCase();
+};
+exports.generateUniqueId = generateUniqueId;
+const createOrUpdateUser = async (userData) => {
     // Check if user exists by phone or email
-    let user = await UserModel.findOne({
+    let user = await User_1.UserModel.findOne({
         $or: [
             ...(userData.phone ? [{ phone: userData.phone }] : []),
             ...(userData.email ? [{ email: userData.email }] : [])
@@ -25,8 +32,8 @@ export const createOrUpdateUser = async (userData) => {
         if (!user.uniqueId) {
             let uniqueId;
             do {
-                uniqueId = generateUniqueId();
-            } while (await UserModel.findOne({ uniqueId }));
+                uniqueId = (0, exports.generateUniqueId)();
+            } while (await User_1.UserModel.findOne({ uniqueId }));
             user.uniqueId = uniqueId;
         }
         await user.save();
@@ -35,9 +42,9 @@ export const createOrUpdateUser = async (userData) => {
         // Create new user with unique ID
         let uniqueId;
         do {
-            uniqueId = generateUniqueId();
-        } while (await UserModel.findOne({ uniqueId }));
-        user = new UserModel({
+            uniqueId = (0, exports.generateUniqueId)();
+        } while (await User_1.UserModel.findOne({ uniqueId }));
+        user = new User_1.UserModel({
             ...userData,
             uniqueId,
             about: userData.about || "Hey there! I am using Alike."
@@ -46,17 +53,19 @@ export const createOrUpdateUser = async (userData) => {
     }
     return user;
 };
-export const getProfile = async (userId) => {
-    const user = await UserModel.findById(userId);
+exports.createOrUpdateUser = createOrUpdateUser;
+const getProfile = async (userId) => {
+    const user = await User_1.UserModel.findById(userId);
     if (!user) {
-        throw createHttpError(404, "User not found");
+        throw (0, http_errors_1.default)(404, "User not found");
     }
     return user;
 };
-export const updateProfile = async (userId, payload) => {
-    const user = await UserModel.findById(userId);
+exports.getProfile = getProfile;
+const updateProfile = async (userId, payload) => {
+    const user = await User_1.UserModel.findById(userId);
     if (!user) {
-        throw createHttpError(404, "User not found");
+        throw (0, http_errors_1.default)(404, "User not found");
     }
     if (payload.name)
         user.name = payload.name;
@@ -70,10 +79,10 @@ export const updateProfile = async (userId, payload) => {
             user.phone = undefined;
         }
         else {
-            const normalizedPhone = normalizePhoneNumber(trimmedPhone);
-            const existingUser = await UserModel.findOne({ phone: normalizedPhone, _id: { $ne: userId } });
+            const normalizedPhone = (0, exports.normalizePhoneNumber)(trimmedPhone);
+            const existingUser = await User_1.UserModel.findOne({ phone: normalizedPhone, _id: { $ne: userId } });
             if (existingUser) {
-                throw createHttpError(409, "Phone number already in use");
+                throw (0, http_errors_1.default)(409, "Phone number already in use");
             }
             user.phone = normalizedPhone;
         }
@@ -81,10 +90,11 @@ export const updateProfile = async (userId, payload) => {
     await user.save();
     return user;
 };
-export const getPublicProfile = async (userId) => {
-    const user = await UserModel.findById(userId);
+exports.updateProfile = updateProfile;
+const getPublicProfile = async (userId) => {
+    const user = await User_1.UserModel.findById(userId);
     if (!user) {
-        throw createHttpError(404, "User not found");
+        throw (0, http_errors_1.default)(404, "User not found");
     }
     return {
         id: user.id,
@@ -98,7 +108,8 @@ export const getPublicProfile = async (userId) => {
         email: user.email
     };
 };
-export const normalizePhoneNumber = (phone) => {
+exports.getPublicProfile = getPublicProfile;
+const normalizePhoneNumber = (phone) => {
     // Remove all non-digit characters
     let normalized = phone.replace(/\D/g, '');
     // If starts with 0 and has 10 digits, assume local format (remove leading 0)
@@ -115,12 +126,13 @@ export const normalizePhoneNumber = (phone) => {
     }
     return normalized;
 };
-export const searchUserByUniqueId = async (uniqueId) => {
+exports.normalizePhoneNumber = normalizePhoneNumber;
+const searchUserByUniqueId = async (uniqueId) => {
     // Normalize unique ID (uppercase, no spaces, remove non-alphanumeric)
     const normalizedId = uniqueId
         .replace(/[^a-zA-Z0-9]/g, '')
         .toUpperCase();
-    const user = await UserModel.findOne({ uniqueId: normalizedId });
+    const user = await User_1.UserModel.findOne({ uniqueId: normalizedId });
     if (!user) {
         return null;
     }
@@ -136,9 +148,10 @@ export const searchUserByUniqueId = async (uniqueId) => {
         email: user.email
     };
 };
-export const searchUserByPhone = async (phone) => {
-    const normalizedPhone = normalizePhoneNumber(phone);
-    const user = await UserModel.findOne({ phone: normalizedPhone });
+exports.searchUserByUniqueId = searchUserByUniqueId;
+const searchUserByPhone = async (phone) => {
+    const normalizedPhone = (0, exports.normalizePhoneNumber)(phone);
+    const user = await User_1.UserModel.findOne({ phone: normalizedPhone });
     if (!user) {
         return null;
     }
@@ -154,4 +167,5 @@ export const searchUserByPhone = async (phone) => {
         email: user.email
     };
 };
+exports.searchUserByPhone = searchUserByPhone;
 //# sourceMappingURL=user.service.js.map

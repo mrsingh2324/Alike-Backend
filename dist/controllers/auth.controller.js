@@ -1,22 +1,25 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getCurrentUserHandler = exports.verifyPhoneOtpHandler = exports.verifyEmailOtpHandler = exports.requestPhoneOtpHandler = exports.requestEmailOtpHandler = void 0;
 // import { OTPChannel } from "@alike/shared";
-import { asyncHandler } from "../utils/asyncHandler";
-import { requestEmailOtp, requestPhoneOtp, verifyOtp, getAuthenticatedUser } from "../services/auth.service";
+const asyncHandler_1 = require("../utils/asyncHandler");
+const auth_service_1 = require("../services/auth.service");
 // Local OTPChannel definition
 const OTPChannel = {
     PHONE: 'phone',
     EMAIL: 'email'
 };
-export const requestEmailOtpHandler = asyncHandler(async (req, res) => {
+exports.requestEmailOtpHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { email } = req.body;
-    const data = await requestEmailOtp(email);
+    const data = await (0, auth_service_1.requestEmailOtp)(email);
     res.json({ success: true, data });
 });
-export const requestPhoneOtpHandler = asyncHandler(async (req, res) => {
+exports.requestPhoneOtpHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { phone } = req.body;
-    const data = await requestPhoneOtp(phone);
+    const data = await (0, auth_service_1.requestPhoneOtp)(phone);
     res.json({ success: true, data });
 });
-export const verifyEmailOtpHandler = asyncHandler(async (req, res) => {
+exports.verifyEmailOtpHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { email, otp, name, phone, profilePicUrl } = req.body;
     console.log(`\n📨 VERIFY EMAIL OTP REQUEST:`);
     console.log(`📧 Email: ${email}`);
@@ -24,7 +27,7 @@ export const verifyEmailOtpHandler = asyncHandler(async (req, res) => {
     console.log(`👤 Name: ${name}`);
     console.log(`📱 Phone: ${phone}`);
     console.log(`🖼️ Profile Pic: ${profilePicUrl}`);
-    const data = await verifyOtp({
+    const data = await (0, auth_service_1.verifyOtp)({
         channel: OTPChannel.EMAIL,
         target: email,
         otp,
@@ -35,9 +38,9 @@ export const verifyEmailOtpHandler = asyncHandler(async (req, res) => {
     });
     res.json({ success: true, data });
 });
-export const verifyPhoneOtpHandler = asyncHandler(async (req, res) => {
+exports.verifyPhoneOtpHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { phone, otp, name, email, profilePicUrl } = req.body;
-    const data = await verifyOtp({
+    const data = await (0, auth_service_1.verifyOtp)({
         channel: OTPChannel.PHONE,
         target: phone,
         otp,
@@ -48,8 +51,8 @@ export const verifyPhoneOtpHandler = asyncHandler(async (req, res) => {
     });
     res.json({ success: true, data });
 });
-export const getCurrentUserHandler = asyncHandler(async (req, res) => {
-    const user = await getAuthenticatedUser(req.userId);
+exports.getCurrentUserHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+    const user = await (0, auth_service_1.getAuthenticatedUser)(req.userId);
     res.json({ success: true, data: user });
 });
 //# sourceMappingURL=auth.controller.js.map

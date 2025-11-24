@@ -1,29 +1,32 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { getProfile, updateProfile, getPublicProfile, searchUserByPhone, searchUserByUniqueId } from "../services/user.service";
-export const getMeHandler = asyncHandler(async (req, res) => {
-    const user = await getProfile(req.userId);
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.searchUserByPhoneHandler = exports.searchUserByUniqueIdHandler = exports.getUserByIdHandler = exports.updateMeHandler = exports.getMeHandler = void 0;
+const asyncHandler_1 = require("../utils/asyncHandler");
+const user_service_1 = require("../services/user.service");
+exports.getMeHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+    const user = await (0, user_service_1.getProfile)(req.userId);
     res.json({ success: true, data: user });
 });
-export const updateMeHandler = asyncHandler(async (req, res) => {
-    const updated = await updateProfile(req.userId, req.body);
+exports.updateMeHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+    const updated = await (0, user_service_1.updateProfile)(req.userId, req.body);
     res.json({ success: true, data: updated });
 });
-export const getUserByIdHandler = asyncHandler(async (req, res) => {
+exports.getUserByIdHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { userId } = req.params;
-    const user = await getPublicProfile(userId);
+    const user = await (0, user_service_1.getPublicProfile)(userId);
     res.json({ success: true, data: user });
 });
-export const searchUserByUniqueIdHandler = asyncHandler(async (req, res) => {
+exports.searchUserByUniqueIdHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { uniqueId } = req.query;
-    const user = await searchUserByUniqueId(uniqueId);
+    const user = await (0, user_service_1.searchUserByUniqueId)(uniqueId);
     if (!user) {
         return res.json({ success: false, message: "User not found" });
     }
     res.json({ success: true, data: user });
 });
-export const searchUserByPhoneHandler = asyncHandler(async (req, res) => {
+exports.searchUserByPhoneHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { phone } = req.query;
-    const user = await searchUserByPhone(phone);
+    const user = await (0, user_service_1.searchUserByPhone)(phone);
     if (!user) {
         return res.json({ success: false, message: "User not found" });
     }

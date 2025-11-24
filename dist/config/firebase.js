@@ -1,20 +1,27 @@
-import admin from "firebase-admin";
-import { env } from "./env";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getFirebaseApp = void 0;
+const firebase_admin_1 = __importDefault(require("firebase-admin"));
+const env_1 = require("./env");
 let initialized = false;
-export const getFirebaseApp = () => {
-    if (!env.FCM_PROJECT_ID || !env.FCM_CLIENT_EMAIL || !env.FCM_PRIVATE_KEY) {
+const getFirebaseApp = () => {
+    if (!env_1.env.FCM_PROJECT_ID || !env_1.env.FCM_CLIENT_EMAIL || !env_1.env.FCM_PRIVATE_KEY) {
         return null;
     }
     if (!initialized) {
-        admin.initializeApp({
-            credential: admin.credential.cert({
-                projectId: env.FCM_PROJECT_ID,
-                clientEmail: env.FCM_CLIENT_EMAIL,
-                privateKey: env.FCM_PRIVATE_KEY.replace(/\\n/g, "\n")
+        firebase_admin_1.default.initializeApp({
+            credential: firebase_admin_1.default.credential.cert({
+                projectId: env_1.env.FCM_PROJECT_ID,
+                clientEmail: env_1.env.FCM_CLIENT_EMAIL,
+                privateKey: env_1.env.FCM_PRIVATE_KEY.replace(/\\n/g, "\n")
             })
         });
         initialized = true;
     }
-    return admin.app();
+    return firebase_admin_1.default.app();
 };
+exports.getFirebaseApp = getFirebaseApp;
 //# sourceMappingURL=firebase.js.map

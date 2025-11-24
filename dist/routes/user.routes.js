@@ -1,36 +1,38 @@
-import { Router } from "express";
-import { z } from "zod";
-import { authMiddleware } from "../middleware/authMiddleware";
-import { validateRequest } from "../middleware/validateRequest";
-import { getMeHandler, getUserByIdHandler, updateMeHandler, searchUserByPhoneHandler, searchUserByUniqueIdHandler } from "../controllers/user.controller";
-const router = Router();
-router.get("/me", authMiddleware, getMeHandler);
-router.patch("/me", authMiddleware, validateRequest(z.object({
-    body: z.object({
-        name: z.string().min(2).optional(),
-        about: z.string().max(256).optional(),
-        profilePicUrl: z.string().url().optional(),
-        phone: z.string().min(6).max(20).optional()
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const zod_1 = require("zod");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const validateRequest_1 = require("../middleware/validateRequest");
+const user_controller_1 = require("../controllers/user.controller");
+const router = (0, express_1.Router)();
+router.get("/me", authMiddleware_1.authMiddleware, user_controller_1.getMeHandler);
+router.patch("/me", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    body: zod_1.z.object({
+        name: zod_1.z.string().min(2).optional(),
+        about: zod_1.z.string().max(256).optional(),
+        profilePicUrl: zod_1.z.string().url().optional(),
+        phone: zod_1.z.string().min(6).max(20).optional()
     })
-})), updateMeHandler);
-router.get("/search", authMiddleware, validateRequest(z.object({
-    query: z.object({
-        phone: z.string().min(10).optional(),
-        uniqueId: z.string().min(4).optional()
+})), user_controller_1.updateMeHandler);
+router.get("/search", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    query: zod_1.z.object({
+        phone: zod_1.z.string().min(10).optional(),
+        uniqueId: zod_1.z.string().min(4).optional()
     }).refine((data) => data.phone || data.uniqueId, { message: "Either phone or uniqueId must be provided" })
 })), (req, res, next) => {
     const { phone, uniqueId } = req.query;
     if (phone) {
-        return searchUserByPhoneHandler(req, res, next);
+        return (0, user_controller_1.searchUserByPhoneHandler)(req, res, next);
     }
     else if (uniqueId) {
-        return searchUserByUniqueIdHandler(req, res, next);
+        return (0, user_controller_1.searchUserByUniqueIdHandler)(req, res, next);
     }
 });
-router.get("/:userId", authMiddleware, validateRequest(z.object({
-    params: z.object({
-        userId: z.string().min(1)
+router.get("/:userId", authMiddleware_1.authMiddleware, (0, validateRequest_1.validateRequest)(zod_1.z.object({
+    params: zod_1.z.object({
+        userId: zod_1.z.string().min(1)
     })
-})), getUserByIdHandler);
-export default router;
+})), user_controller_1.getUserByIdHandler);
+exports.default = router;
 //# sourceMappingURL=user.routes.js.map

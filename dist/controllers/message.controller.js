@@ -1,26 +1,29 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { getMessages, sendMessage, markMessagesDelivered, markMessagesRead } from "../services/message.service";
-export const listMessagesHandler = asyncHandler(async (req, res) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.markReadHandler = exports.markDeliveredHandler = exports.sendMessageHandler = exports.listMessagesHandler = void 0;
+const asyncHandler_1 = require("../utils/asyncHandler");
+const message_service_1 = require("../services/message.service");
+exports.listMessagesHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    const messages = await getMessages(chatId, req.userId, {
+    const messages = await (0, message_service_1.getMessages)(chatId, req.userId, {
         before: req.query.before,
         limit: req.query.limit ? Number(req.query.limit) : undefined
     });
     res.json({ success: true, data: messages });
 });
-export const sendMessageHandler = asyncHandler(async (req, res) => {
+exports.sendMessageHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    const message = await sendMessage(chatId, req.userId, req.body.text);
+    const message = await (0, message_service_1.sendMessage)(chatId, req.userId, req.body.text);
     res.json({ success: true, data: message });
 });
-export const markDeliveredHandler = asyncHandler(async (req, res) => {
+exports.markDeliveredHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    await markMessagesDelivered(chatId, req.userId);
+    await (0, message_service_1.markMessagesDelivered)(chatId, req.userId);
     res.json({ success: true });
 });
-export const markReadHandler = asyncHandler(async (req, res) => {
+exports.markReadHandler = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const { chatId } = req.params;
-    await markMessagesRead(chatId, req.userId);
+    await (0, message_service_1.markMessagesRead)(chatId, req.userId);
     res.json({ success: true });
 });
 //# sourceMappingURL=message.controller.js.map

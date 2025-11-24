@@ -1,4 +1,7 @@
-import { Schema, model } from "mongoose";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MessageModel = void 0;
+const mongoose_1 = require("mongoose");
 // import { MessageStatus } from "@alike/shared";
 // Local MessageStatus definition
 const MessageStatus = {
@@ -6,9 +9,9 @@ const MessageStatus = {
     DELIVERED: 'delivered',
     READ: 'read'
 };
-const MessageSchema = new Schema({
-    chatId: { type: Schema.Types.ObjectId, ref: "Chat", required: true, index: true },
-    senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+const MessageSchema = new mongoose_1.Schema({
+    chatId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Chat", required: true, index: true },
+    senderId: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
     text: { type: String, required: false },
     mediaUrl: { type: String },
     mediaType: { type: String, enum: ['image', 'video', 'file'] },
@@ -18,5 +21,5 @@ const MessageSchema = new Schema({
     isDeletedForSender: { type: Boolean, default: false },
     isDeletedForAll: { type: Boolean, default: false }
 }, { timestamps: true });
-export const MessageModel = model("Message", MessageSchema);
+exports.MessageModel = (0, mongoose_1.model)("Message", MessageSchema);
 //# sourceMappingURL=Message.js.map

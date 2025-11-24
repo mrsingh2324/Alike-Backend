@@ -1,60 +1,70 @@
-import createHttpError from "http-errors";
-import { MessageModel } from "../models/Message";
-import { ChatModel } from "../models/Chat";
-import { BlockedUserModel } from "../models/BlockedUser";
-import { ensureChatMembership, incrementUnreadForParticipants, resetUnreadCount } from "./chat.service";
-import { MessageStatus } from "../types/shared";
-export const getMessages = async (chatId, userId, options) => {
-    await ensureChatMembership(chatId, userId);
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.markMessagesRead = exports.markMessagesDelivered = exports.sendMessage = exports.getMessages = void 0;
+const http_errors_1 = __importDefault(require("http-errors"));
+const Message_1 = require("../models/Message");
+const Chat_1 = require("../models/Chat");
+const BlockedUser_1 = require("../models/BlockedUser");
+const chat_service_1 = require("./chat.service");
+const shared_1 = require("../types/shared");
+const getMessages = async (chatId, userId, options) => {
+    await (0, chat_service_1.ensureChatMembership)(chatId, userId);
     const limit = Math.min(options.limit ?? 30, 100);
     const filters = { chatId };
     if (options.before) {
         filters._id = { $lt: options.before };
     }
-    const messages = await MessageModel.find(filters)
+    const messages = await Message_1.MessageModel.find(filters)
         .sort({ createdAt: -1 })
         .limit(limit)
         .lean();
     return messages.reverse();
 };
+exports.getMessages = getMessages;
 const ensureNotBlockedForMessage = async (chatId, senderId) => {
-    const chat = await ChatModel.findById(chatId);
+    const chat = await Chat_1.ChatModel.findById(chatId);
     if (!chat) {
-        throw createHttpError(404, "Chat not found");
+        throw (0, http_errors_1.default)(404, "Chat not found");
     }
     if (chat.type === "single") {
         const receiverId = chat.members.find((member) => member.toString() !== senderId)?.toString();
         if (!receiverId)
             return;
-        const blocked = await BlockedUserModel.findOne({ userId: receiverId, blockedUserId: senderId });
+        const blocked = await BlockedUser_1.BlockedUserModel.findOne({ userId: receiverId, blockedUserId: senderId });
         if (blocked) {
-            throw createHttpError(403, "Recipient has blocked you");
+            throw (0, http_errors_1.default)(403, "Recipient has blocked you");
         }
     }
 };
-export const sendMessage = async (chatId, senderId, text) => {
+const sendMessage = async (chatId, senderId, text) => {
     if (!text.trim()) {
-        throw createHttpError(400, "Message text is required");
+        throw (0, http_errors_1.default)(400, "Message text is required");
     }
-    await ensureChatMembership(chatId, senderId);
+    await (0, chat_service_1.ensureChatMembership)(chatId, senderId);
     await ensureNotBlockedForMessage(chatId, senderId);
-    const message = await MessageModel.create({
+    const message = await Message_1.MessageModel.create({
         chatId,
         senderId,
         text,
-        status: MessageStatus.SENT
+        status: shared_1.MessageStatus.SENT
     });
-    await ChatModel.findByIdAndUpdate(chatId, { lastMessage: message.id });
-    await incrementUnreadForParticipants(chatId, senderId);
+    await Chat_1.ChatModel.findByIdAndUpdate(chatId, { lastMessage: message.id });
+    await (0, chat_service_1.incrementUnreadForParticipants)(chatId, senderId);
     return message;
 };
-export const markMessagesDelivered = async (chatId, userId) => {
-    await ensureChatMembership(chatId, userId);
-    await MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: MessageStatus.SENT }, { status: MessageStatus.DELIVERED });
+exports.sendMessage = sendMessage;
+const markMessagesDelivered = async (chatId, userId) => {
+    await (0, chat_service_1.ensureChatMembership)(chatId, userId);
+    await Message_1.MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: shared_1.MessageStatus.SENT }, { status: shared_1.MessageStatus.DELIVERED });
 };
-export const markMessagesRead = async (chatId, userId) => {
-    await ensureChatMembership(chatId, userId);
-    await MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: { $ne: MessageStatus.READ } }, { status: MessageStatus.READ });
-    await resetUnreadCount(chatId, userId);
+exports.markMessagesDelivered = markMessagesDelivered;
+const markMessagesRead = async (chatId, userId) => {
+    await (0, chat_service_1.ensureChatMembership)(chatId, userId);
+    await Message_1.MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: { $ne: shared_1.MessageStatus.READ } }, { status: shared_1.MessageStatus.READ });
+    await (0, chat_service_1.resetUnreadCount)(chatId, userId);
 };
+exports.markMessagesRead = markMessagesRead;
 //# sourceMappingURL=message.service.js.map
