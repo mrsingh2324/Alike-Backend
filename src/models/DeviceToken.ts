@@ -1,5 +1,9 @@
 import { Schema, model, type Model, type Types } from "mongoose";
-import { PlatformType } from "../types/shared";
+enum PlatformType {
+  IOS = 'ios',
+  ANDROID = 'android',
+  WEB = 'web',
+}
 
 export interface IDeviceToken {
   userId: Types.ObjectId;

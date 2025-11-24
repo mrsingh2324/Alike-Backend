@@ -5,7 +5,11 @@ import { ChatParticipantModel } from "../models/ChatParticipant";
 import { UserModel } from "../models/User";
 import { BlockedUserModel } from "../models/BlockedUser";
 import { MessageModel } from "../models/Message";
-import { ChatType } from "../types/shared";
+enum ChatType {
+  SINGLE = 'single',
+  DIRECT = 'direct',
+  GROUP = 'group',
+}
 
 const ensureNotBlocked = async (userId: string, otherUserId: string) => {
   const [blockedByOther, blockedByUser] = await Promise.all([

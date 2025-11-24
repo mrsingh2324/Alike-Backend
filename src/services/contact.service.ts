@@ -1,5 +1,10 @@
 import createHttpError from "http-errors";
-import type { ContactInput } from "../types/shared";
+
+interface ContactInput {
+  name: string;
+  phone?: string;
+  email?: string;
+}
 import { ContactModel } from "../models/Contact";
 import { UserModel, type IUserDocument } from "../models/User";
 import { BlockedUserModel } from "../models/BlockedUser";

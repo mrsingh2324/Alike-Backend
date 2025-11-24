@@ -9,7 +9,12 @@ const Message_1 = require("../models/Message");
 const Chat_1 = require("../models/Chat");
 const BlockedUser_1 = require("../models/BlockedUser");
 const chat_service_1 = require("./chat.service");
-const shared_1 = require("../types/shared");
+var MessageStatus;
+(function (MessageStatus) {
+    MessageStatus["SENT"] = "sent";
+    MessageStatus["DELIVERED"] = "delivered";
+    MessageStatus["READ"] = "read";
+})(MessageStatus || (MessageStatus = {}));
 const getMessages = async (chatId, userId, options) => {
     await (0, chat_service_1.ensureChatMembership)(chatId, userId);
     const limit = Math.min(options.limit ?? 30, 100);
@@ -49,7 +54,7 @@ const sendMessage = async (chatId, senderId, text) => {
         chatId,
         senderId,
         text,
-        status: shared_1.MessageStatus.SENT
+        status: MessageStatus.SENT
     });
     await Chat_1.ChatModel.findByIdAndUpdate(chatId, { lastMessage: message.id });
     await (0, chat_service_1.incrementUnreadForParticipants)(chatId, senderId);
@@ -58,12 +63,12 @@ const sendMessage = async (chatId, senderId, text) => {
 exports.sendMessage = sendMessage;
 const markMessagesDelivered = async (chatId, userId) => {
     await (0, chat_service_1.ensureChatMembership)(chatId, userId);
-    await Message_1.MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: shared_1.MessageStatus.SENT }, { status: shared_1.MessageStatus.DELIVERED });
+    await Message_1.MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: MessageStatus.SENT }, { status: MessageStatus.DELIVERED });
 };
 exports.markMessagesDelivered = markMessagesDelivered;
 const markMessagesRead = async (chatId, userId) => {
     await (0, chat_service_1.ensureChatMembership)(chatId, userId);
-    await Message_1.MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: { $ne: shared_1.MessageStatus.READ } }, { status: shared_1.MessageStatus.READ });
+    await Message_1.MessageModel.updateMany({ chatId, senderId: { $ne: userId }, status: { $ne: MessageStatus.READ } }, { status: MessageStatus.READ });
     await (0, chat_service_1.resetUnreadCount)(chatId, userId);
 };
 exports.markMessagesRead = markMessagesRead;

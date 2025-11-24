@@ -10,7 +10,12 @@ const Chat_1 = require("../models/Chat");
 const ChatParticipant_1 = require("../models/ChatParticipant");
 const User_1 = require("../models/User");
 const BlockedUser_1 = require("../models/BlockedUser");
-const shared_1 = require("../types/shared");
+var ChatType;
+(function (ChatType) {
+    ChatType["SINGLE"] = "single";
+    ChatType["DIRECT"] = "direct";
+    ChatType["GROUP"] = "group";
+})(ChatType || (ChatType = {}));
 const ensureNotBlocked = async (userId, otherUserId) => {
     const [blockedByOther, blockedByUser] = await Promise.all([
         BlockedUser_1.BlockedUserModel.findOne({ userId: otherUserId, blockedUserId: userId }),
@@ -37,12 +42,12 @@ const createOrGetSingleChat = async (userId, targetUserId) => {
     }
     await ensureNotBlocked(userId, targetUserId);
     const membersHash = [userId, targetUserId].sort().join(":");
-    let chat = await Chat_1.ChatModel.findOne({ type: shared_1.ChatType.SINGLE, membersHash })
+    let chat = await Chat_1.ChatModel.findOne({ type: ChatType.SINGLE, membersHash })
         .populate("members")
         .populate("lastMessage");
     if (!chat) {
         chat = await Chat_1.ChatModel.create({
-            type: shared_1.ChatType.SINGLE,
+            type: ChatType.SINGLE,
             createdBy: userId,
             members: [userId, targetUserId],
             membersHash
@@ -63,7 +68,7 @@ const createGroupChat = async (creatorId, payload) => {
         throw (0, http_errors_1.default)(400, "One or more members do not exist");
     }
     const chat = await Chat_1.ChatModel.create({
-        type: shared_1.ChatType.GROUP,
+        type: ChatType.GROUP,
         createdBy: creatorId,
         members: memberIds,
         groupName: payload.name,
@@ -140,7 +145,7 @@ const addMembers = async (chatId, adminId, memberIds) => {
         throw (0, http_errors_1.default)(403, "Only admins can add members");
     }
     const chat = await Chat_1.ChatModel.findById(chatId);
-    if (!chat || chat.type !== shared_1.ChatType.GROUP) {
+    if (!chat || chat.type !== ChatType.GROUP) {
         throw (0, http_errors_1.default)(400, "Not a group chat");
     }
     const existing = await ChatParticipant_1.ChatParticipantModel.find({ chatId, userId: { $in: memberIds } });
@@ -170,7 +175,7 @@ const updateGroupDetails = async (chatId, adminId, payload) => {
         throw (0, http_errors_1.default)(403, "Only admins can update group details");
     }
     const chat = await Chat_1.ChatModel.findById(chatId);
-    if (!chat || chat.type !== shared_1.ChatType.GROUP) {
+    if (!chat || chat.type !== ChatType.GROUP) {
         throw (0, http_errors_1.default)(400, "Not a group chat");
     }
     if (payload.name)

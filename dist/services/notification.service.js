@@ -4,6 +4,12 @@ exports.sendMessageNotification = exports.unregisterDeviceToken = exports.regist
 const DeviceToken_1 = require("../models/DeviceToken");
 const firebase_1 = require("../config/firebase");
 const logger_1 = require("../config/logger");
+var PlatformType;
+(function (PlatformType) {
+    PlatformType["IOS"] = "ios";
+    PlatformType["ANDROID"] = "android";
+    PlatformType["WEB"] = "web";
+})(PlatformType || (PlatformType = {}));
 const registerDeviceToken = async (userId, token, platform) => {
     await DeviceToken_1.DeviceTokenModel.updateOne({ token }, { userId, token, platform }, { upsert: true });
 };
